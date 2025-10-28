@@ -1,35 +1,35 @@
 import React, { useEffect, useState, useRef } from "react";
-import { AppboxoWebSDK } from "web-sdk";
-// Test helpers available at /src/TestHelpers.tsx
+import { AppboxoWebSDK } from "boxo-desktop-host-sdk";
 import "./App.css";
-
-const config = {
-  clientId: "602248",
-  appId: "app29296",
-  baseUrl: "https://dashboard.appboxo.com/api/v1",
-  debug: true,
-};
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const sdkRef = useRef<AppboxoWebSDK | null>(null);
 
-  // Initialize SDK
+  // Create SDK instance once
   useEffect(() => {
-    const boxoSdk = new AppboxoWebSDK(config);
+    const boxoSdk = new AppboxoWebSDK({
+      clientId: "602248",
+      appId: "app29296",
+      debug: true,
+    });
     boxoSdk.setAuthCode("tNCYV57xV03Ds3ar63oQtddQxUxCRY");
-
-    // Set iframe and initialize
-    if (iframeRef.current) {
-      boxoSdk.setIframe(iframeRef.current);
-      boxoSdk.initialize();
-      setIsInitialized(true);
-    }
+    sdkRef.current = boxoSdk;
 
     return () => {
       boxoSdk.destroy();
     };
   }, []);
+
+  // Handle iframe load
+  const handleIframeLoad = () => {
+    if (sdkRef.current && iframeRef.current && !isInitialized) {
+      sdkRef.current.setIframe(iframeRef.current);
+      sdkRef.current.initialize();
+      setIsInitialized(true);
+    }
+  };
 
   return (
     <div className="App">
@@ -45,6 +45,7 @@ function App() {
                 src="http://localhost:3000"
                 title="Miniapp"
                 className="miniapp-iframe"
+                onLoad={handleIframeLoad}
               />
               <div className="iframe-note">
                 <p>Iframe: {iframeRef.current ? "Ready" : "Loading..."}</p>
