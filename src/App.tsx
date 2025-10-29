@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { AppboxoWebSDK } from "boxo-desktop-host-sdk";
+import { AppboxoWebSDK } from "@appboxo/web-sdk";
 import "./App.css";
 
 function App() {
