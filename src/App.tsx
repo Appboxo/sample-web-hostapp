@@ -10,11 +10,11 @@ function App() {
   // Create SDK instance once
   useEffect(() => {
     const boxoSdk = new AppboxoWebSDK({
-      clientId: "602248",
-      appId: "app29296",
+      clientId: "your-client-id-here", // Replace with actual clientId 
+      appId: "your-app-id-here", // Replace with actual appId
       debug: true,
     });
-    boxoSdk.setAuthCode("tNCYV57xV03Ds3ar63oQtddQxUxCRY");
+    boxoSdk.setAuthCode("your-auth-code-here"); // Replace with actual auth code
     sdkRef.current = boxoSdk;
 
     return () => {
