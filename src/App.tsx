@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AppboxoWebSDK } from "@appboxo/web-sdk";
 import "./App.css";
 
@@ -9,16 +9,16 @@ function App() {
 
   // Create SDK instance once
   useEffect(() => {
-    const boxoSdk = new AppboxoWebSDK({
+    const appboxoWebSDK = new AppboxoWebSDK({
       clientId: "your-client-id-here", // Replace with actual clientId 
       appId: "your-app-id-here", // Replace with actual appId
       debug: true,
     });
-    boxoSdk.setAuthCode("your-auth-code-here"); // Replace with actual auth code
-    sdkRef.current = boxoSdk;
+    appboxoWebSDK.setAuthCode("your-auth-code-here"); // Replace with actual auth code
+    sdkRef.current = appboxoWebSDK;
 
     return () => {
-      boxoSdk.destroy();
+      appboxoWebSDK.destroy();
     };
   }, []);
 
