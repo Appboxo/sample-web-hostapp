@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { AppboxoWebSDK } from "@appboxo/web-sdk";
 import type { PaymentRequest, PaymentResponse } from "@appboxo/web-sdk";
+import { PaymentStatusValues } from "./utils/constants";
+import { createPaymentResponse } from "./utils/payment";
 import "./App.css";
+
+// Configuration constants - modify these for your environment
+const MINIAPP_IFRAME_URL = "http://localhost:3000";
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -26,11 +31,11 @@ function App() {
         // Mock response for demo
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        return {
-          ...paymentData,
-          status: "paid", // 'paid' | 'failed' | 'in_process' | 'cancelled'
-          hostappOrderId: `order_${Date.now()}`,
-        };
+        return createPaymentResponse(
+          paymentData,
+          PaymentStatusValues.Success, // status can be Success, Failed, Cancelled
+          `order_${Date.now()}` // orderId
+        );
       },
     });
 
@@ -63,7 +68,7 @@ function App() {
               <iframe
                 ref={iframeRef}
                 id="miniapp-iframe"
-                src="http://localhost:3000"
+                src={MINIAPP_IFRAME_URL}
                 title="Miniapp"
                 className="miniapp-iframe"
                 onLoad={handleIframeLoad}
