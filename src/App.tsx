@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { AppboxoWebSDK } from "@appboxo/web-sdk";
+import type { PaymentRequest, PaymentResponse } from "@appboxo/web-sdk";
 import "./App.css";
 
 function App() {
@@ -7,19 +8,39 @@ function App() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
 
-  // Create SDK instance once
   useEffect(() => {
-    const appboxoWebSDK = new AppboxoWebSDK({
-      clientId: "your-client-id-here", // Replace with actual clientId 
+    const boxoSdk = new AppboxoWebSDK({
+      clientId: "your-client-id-here", // Replace with actual clientId
       appId: "your-app-id-here", // Replace with actual appId
       debug: true,
-    });
-    appboxoWebSDK.setAuthCode("your-auth-code-here"); // Replace with actual auth code
-    sdkRef.current = appboxoWebSDK;
+      // Payment handler - replace this with your Finom payment API call
+      onPaymentRequest: async (
+        paymentData: PaymentRequest
+      ): Promise<PaymentResponse> => {
+        console.log("Payment request:", paymentData);
 
-    return () => {
-      appboxoWebSDK.destroy();
-    };
+        // TODO: Replace with actual Finom payment API call
+        // const response = await fetch('/api/finom/payments/process', { ... });
+        // const result = await response.json();
+
+        // Mock response for demo
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        return {
+          ...paymentData,
+          status: "paid", // 'paid' | 'failed' | 'in_process' | 'cancelled'
+          hostappOrderId: `order_${Date.now()}`,
+        };
+      },
+    });
+
+    boxoSdk.setAuthCode("your-auth-code-here"); // Replace with actual auth code
+    boxoSdk.onPaymentComplete((success, data) => {
+      console.log("Payment complete:", success, data);
+    });
+
+    sdkRef.current = boxoSdk;
+    return () => boxoSdk.destroy();
   }, []);
 
   // Handle iframe load
