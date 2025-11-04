@@ -18,8 +18,16 @@ function OAuthExample() {
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
+  const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
 
   useEffect(() => {
+    // Prevent SDK from being created multiple times (React Strict Mode guard)
+    if (initRef.current) {
+      console.log('[OAuthExample] SDK already initialized, skipping');
+      return;
+    }
+    initRef.current = true;
+
     const boxoSdk = new AppboxoWebSDK({
       clientId: CLIENT_ID,
       appId: APP_ID,
@@ -77,7 +85,9 @@ function OAuthExample() {
 
     mountMiniapp();
 
-    return () => boxoSdk.destroy();
+    return () => {
+      boxoSdk.destroy();
+    };
   }, []);
 
   return (
