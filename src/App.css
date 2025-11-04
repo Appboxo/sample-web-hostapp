@@ -195,9 +195,14 @@
   background: #f8f9fa;
 }
 
-.miniapp-iframe {
+.miniapp-container {
   width: 100%;
   height: 500px;
+}
+
+.miniapp-iframe {
+  width: 100%;
+  height: 100%;
   border: none;
 }
 

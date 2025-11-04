@@ -7,7 +7,6 @@ import { createPaymentResponse } from "../utils/payment";
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
-const MINIAPP_IFRAME_URL = "http://localhost:3000";
 const CLIENT_ID = "your-client-id-here"; // Replace with actual clientId
 const APP_ID = "your-app-id-here"; // Replace with actual appId
 
@@ -15,8 +14,9 @@ const APP_ID = "your-app-id-here"; // Replace with actual appId
 const ENABLE_PAYMENT = true;
 
 function DirectAuthExample() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
 
   useEffect(() => {
@@ -98,16 +98,25 @@ function DirectAuthExample() {
     }
 
     sdkRef.current = boxoSdk;
+
+    const mountMiniapp = async () => {
+      if (!containerRef.current) return;
+      try {
+        setError(null);
+        await boxoSdk.mount({
+          container: containerRef.current,
+          className: "miniapp-iframe",
+        });
+        setIsMounted(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      }
+    };
+
+    mountMiniapp();
+
     return () => boxoSdk.destroy();
   }, []);
-
-  const handleIframeLoad = () => {
-    if (sdkRef.current && iframeRef.current && !isInitialized) {
-      sdkRef.current.setIframe(iframeRef.current);
-      sdkRef.current.initialize();
-      setIsInitialized(true);
-    }
-  };
 
   return (
     <div className="App">
@@ -115,18 +124,24 @@ function DirectAuthExample() {
         <main className="main-content">
           <div className="card">
             <h2>Direct Auth - Miniapp Container</h2>
+            {error && (
+              <div
+                style={{
+                  marginBottom: "20px",
+                  padding: "10px",
+                  backgroundColor: "#fee",
+                  border: "1px solid #fcc",
+                  borderRadius: "4px",
+                }}
+              >
+                <strong>Error:</strong> {error}
+              </div>
+            )}
             <div className="iframe-container">
-              <iframe
-                ref={iframeRef}
-                id="miniapp-iframe"
-                src={MINIAPP_IFRAME_URL}
-                title="Miniapp"
-                className="miniapp-iframe"
-                onLoad={handleIframeLoad}
-              />
+              <div ref={containerRef} className="miniapp-container" />
               <div className="iframe-note">
-                <p>Iframe: {iframeRef.current ? "Ready" : "Loading..."}</p>
-                <p>SDK: {isInitialized ? "Initialized" : "Not initialized"}</p>
+                <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
+                <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
               </div>
             </div>
           </div>
