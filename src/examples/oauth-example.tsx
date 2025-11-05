@@ -21,6 +21,8 @@ function OAuthExample() {
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
 
   useEffect(() => {
+    console.log('[OAuthExample] useEffect running');
+    
     // Prevent SDK from being created multiple times (React Strict Mode guard)
     if (initRef.current) {
       console.log('[OAuthExample] SDK already initialized, skipping');
@@ -86,7 +88,19 @@ function OAuthExample() {
     mountMiniapp();
 
     return () => {
-      boxoSdk.destroy();
+      console.log('[OAuthExample] useEffect cleanup running');
+      // Use closure variable boxoSdk directly, not sdkRef.current
+      // because sdkRef might be overwritten by a new instance
+      if (boxoSdk) {
+        console.log('[OAuthExample] Cleanup: destroying SDK');
+        boxoSdk.destroy();
+        if (sdkRef.current === boxoSdk) {
+          sdkRef.current = null;
+        }
+        setIsMounted(false);
+      } else {
+        console.log('[OAuthExample] Cleanup: boxoSdk is null, skipping destroy');
+      }
     };
   }, []);
 

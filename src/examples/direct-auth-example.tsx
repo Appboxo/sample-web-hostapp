@@ -21,6 +21,8 @@ function DirectAuthExample() {
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
 
   useEffect(() => {
+    console.log('[DirectAuthExample] useEffect running');
+    
     // Prevent SDK from being created multiple times (React Strict Mode guard)
     if (initRef.current) {
       console.log('[DirectAuthExample] SDK already initialized, skipping');
@@ -124,7 +126,19 @@ function DirectAuthExample() {
     mountMiniapp();
 
     return () => {
-      boxoSdk.destroy();
+      console.log('[DirectAuthExample] useEffect cleanup running');
+      // Use closure variable boxoSdk directly, not sdkRef.current
+      // because sdkRef might be overwritten by a new instance
+      if (boxoSdk) {
+        console.log('[DirectAuthExample] Cleanup: destroying SDK');
+        boxoSdk.destroy();
+        if (sdkRef.current === boxoSdk) {
+          sdkRef.current = null;
+        }
+        setIsMounted(false);
+      } else {
+        console.log('[DirectAuthExample] Cleanup: boxoSdk is null, skipping destroy');
+      }
     };
   }, []);
 

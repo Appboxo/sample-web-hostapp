@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./App.css";
 import { OAuthExample, DirectAuthExample } from "./examples";
 
@@ -5,10 +6,26 @@ enum AuthMethod {
   OAuth = "oauth",
   Direct = "direct",
 }
-const AUTH_METHOD: AuthMethod = AuthMethod.Direct;
 
 function App() {
-  return AUTH_METHOD === AuthMethod.OAuth ? <OAuthExample /> : <DirectAuthExample />;
+  const [onPage, setOnPage] = useState(true);
+
+  const trigger = () => {
+    setOnPage((prev) => {
+      return !prev;
+    });
+  };
+
+  return (
+    <>
+      <button onClick={trigger}>Trigger</button>
+      {onPage ? (
+        <OAuthExample />
+      ) : (
+        <DirectAuthExample />
+      )}
+    </>
+  );
 }
 
 export default App;
