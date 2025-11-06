@@ -31,8 +31,8 @@ function DirectAuthExample() {
     const boxoSdk = new AppboxoWebSDK({
       clientId: CLIENT_ID,
       appId: APP_ID,
-      debug: true,
-
+      debug: false,
+      locale: "ar",
       // Payment handler (optional - remove if ENABLE_PAYMENT is false)
       ...(ENABLE_PAYMENT && {
         onPaymentRequest: async (
