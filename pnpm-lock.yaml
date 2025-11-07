@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@appboxo/web-sdk':
-        specifier: 1.1.9
-        version: 1.1.9
+        specifier: 1.2.1
+        version: 1.2.1
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -71,8 +71,8 @@ packages:
     peerDependencies:
       ajv: '>=8'
 
-  '@appboxo/web-sdk@1.1.9':
-    resolution: {integrity: sha512-Wd7eVXLHi26HbAB1CluuFPVzUo1h7idu7dB7+9jiJTO/CPeeZ5Yl3Nxr8ZrJT7CoOG3G8s8aCAZtzn+oXn6A1g==}
+  '@appboxo/web-sdk@1.2.1':
+    resolution: {integrity: sha512-yOvIIGq13OT2uUzi5lRCP0XRrIwT+hotXYQuzjYTeSYP0Cw/qoBcyPjvTN9+h8JYy7ORYSFeASiyzXNzQqg6gg==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -5568,7 +5568,7 @@ snapshots:
       jsonpointer: 5.0.1
       leven: 3.1.0
 
-  '@appboxo/web-sdk@1.1.9':
+  '@appboxo/web-sdk@1.2.1':
     dependencies:
       axios: 1.13.2
     transitivePeerDependencies:
