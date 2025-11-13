@@ -32,7 +32,8 @@ function OAuthExample() {
       clientId: CLIENT_ID,
       appId: APP_ID,
       debug: false,
-      locale: "ar",
+      // locale: "ar",
+      isDesktop:true,
       allowedOrigins: [], // Set `allowedOrigins` → restrict to specific domains
       // Payment handler (optional - remove if ENABLE_PAYMENT is false)
       ...(ENABLE_PAYMENT && {
