@@ -116,6 +116,28 @@ function OAuthExample() {
               <div className="iframe-note">
                 <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
                 <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
+                <button
+                  onClick={() => {
+                    if (sdkRef.current) {
+                      console.log("[OAuthExample] Calling logout()");
+                      sdkRef.current.logout();
+                      console.log("[OAuthExample] Logout completed");
+                      alert("Logout called! Check console and localStorage/sessionStorage.");
+                    }
+                  }}
+                  style={{
+                    marginTop: "10px",
+                    padding: "8px 16px",
+                    backgroundColor: "#f44336",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                  }}
+                >
+                  Logout
+                </button>
               </div>
             </div>
           </div>
