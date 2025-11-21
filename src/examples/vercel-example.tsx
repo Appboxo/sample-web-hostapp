@@ -232,8 +232,8 @@ function VercelExample() {
 
   return (
     <div className="App">
-      <div className="main-container">
-        <main className="main-content">
+      <div className="">
+        <main className="">
           <div className="card">
             <h2>OAuth - Miniapp Container</h2>
             {error && (
@@ -249,8 +249,8 @@ function VercelExample() {
                 <strong>Error:</strong> {error}
               </div>
             )}
-            <div className="iframe-container">
-              <div ref={containerRef} className="miniapp-container" />
+            <div className="">
+              <div ref={containerRef} className="" style={{width: "100%", height: "90vh"}} />
               <div className="iframe-note">
                 <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
                 <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
