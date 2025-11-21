@@ -1,14 +1,16 @@
 import "./App.css";
-import { OAuthExample, DirectAuthExample } from "./examples";
+// import { OAuthExample, DirectAuthExample } from "./examples";
+import VercelExample from "./examples/vercel-example";
 
-enum AuthMethod {
-  OAuth = "oauth",
-  Direct = "direct",
-}
-const AUTH_METHOD: AuthMethod = AuthMethod.Direct;
+// enum AuthMethod {
+//   OAuth = "oauth",
+//   Direct = "direct",
+//   Vercel = "vercel",
+// }
+// const AUTH_METHOD: AuthMethod = AuthMethod.Vercel;
 
 function App() {
-  return AUTH_METHOD === AuthMethod.OAuth ? <OAuthExample /> : <DirectAuthExample />;
+  return <VercelExample />;
 }
 
 export default App;
