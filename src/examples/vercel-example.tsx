@@ -250,7 +250,7 @@ function VercelExample() {
               </div>
             )}
             <div className="">
-              <div ref={containerRef} className="" style={{width: "100%", height: "90vh"}} />
+              <div ref={containerRef} className="" style={{width: "100%", height: "100vh"}} />
               <div className="iframe-note">
                 <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
                 <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
