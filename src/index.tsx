@@ -4,6 +4,8 @@ import './index.css';
 import './telegram-init';
  // Initialize Telegram polyfills and eruda
 import App from './App';
+import ErrorBoundary from './ErrorBoundary';
+import { ErrorDisplay } from './components/ErrorDisplay';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
@@ -11,7 +13,10 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+      <ErrorDisplay />
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

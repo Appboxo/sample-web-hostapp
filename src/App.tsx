@@ -38,6 +38,7 @@ function App() {
   const exampleType = getExampleType();
   
   console.log(`[App] Loading example: ${exampleType}`);
+  console.error(`[App] ERROR TEST - Loading example: ${exampleType}`);
   
   switch (exampleType) {
     case ExampleType.OAuth:
@@ -47,6 +48,7 @@ function App() {
     case ExampleType.Vercel:
       return <VercelExample />;
     case ExampleType.LocalStorageTest:
+      console.log(`[App] About to render LocalStorageTestExample`);
       return <LocalStorageTestExample />;
     default:
       return <OAuthExample />;

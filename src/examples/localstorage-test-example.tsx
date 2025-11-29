@@ -14,6 +14,7 @@ const MINIAPP_URL =
 
 function LocalStorageTestExample() {
   const [isMounted, setIsMounted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string>(
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MzgzNzQ2LCJpYXQiOjE3NjQyOTczNDYsImp0aSI6ImViOWU5MGIyMTE4NDRlOTBiOTg1NjdmZjBjYmNmNzAzIiwic3ViIjoiOTYxIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.J_5Ac479JDjQHBqE94qmAOhiRilwK8nYmcXN2qbDt3o"
   );
@@ -22,12 +23,14 @@ function LocalStorageTestExample() {
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
+  const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
 
-  // Initialize SDK with onGetAuthTokens callback
   useEffect(() => {
-    if (sdkRef.current) {
+    // Prevent SDK from being created multiple times (React Strict Mode guard)
+    if (initRef.current) {
       return;
     }
+    initRef.current = true;
     
     // Add message listener for custom URL fallback
     const messageListener = (event: MessageEvent) => {
@@ -39,8 +42,10 @@ function LocalStorageTestExample() {
       
       if (isAppboxoSdkMessage) {
         const handler = eventData.handler || 'unknown';
+        console.log("[LocalStorageTest] Received SDK message:", handler, eventData);
         
         if (handler === 'AppBoxoWebAppGetInitData') {
+          console.log("[LocalStorageTest] Handling AppBoxoWebAppGetInitData request");
           // If SDK doesn't respond, manually send a response after a short delay
           setTimeout(() => {
             const iframe = containerRef.current?.querySelector("iframe");
@@ -60,7 +65,10 @@ function LocalStorageTestExample() {
                 },
                 request_id: eventData.request_id,
               };
+              console.log("[LocalStorageTest] Sending InitData response:", response);
               iframe.contentWindow.postMessage(response, '*');
+            } else {
+              console.warn("[LocalStorageTest] Iframe not found when trying to send InitData");
             }
           }, 100);
         }
@@ -73,15 +81,9 @@ function LocalStorageTestExample() {
     const boxoSdk = new AppboxoWebSDK({
       clientId: CLIENT_ID,
       appId: APP_ID,
-      debug: true,
+      debug: true, // Enable debug to see SDK messages
       isDesktop: true,
-      allowedOrigins: [
-        window.location.origin,
-        "http://localhost:3000",
-        "https://summer.ngrok.dev",
-        "https://esim-telegram-web.ngrok.app",
-        "*", // Allow all for testing
-      ],
+      allowedOrigins: [], // Set `allowedOrigins` → restrict to specific domains
       // Configure auth token callback - returns tokens from user input
       onGetAuthTokens: async () => {
         if (token.trim() && refreshToken.trim()) {
@@ -98,42 +100,58 @@ function LocalStorageTestExample() {
       },
     });
 
+    boxoSdk.onLoginComplete((success: boolean, data?: any) => {
+      console.log("[Auth] Login complete:", success, data);
+    });
+
     sdkRef.current = boxoSdk;
 
-    // Mount miniapp when container is ready
     const mountMiniapp = async () => {
       if (!containerRef.current) {
+        console.error("[LocalStorageTest] Container not ready");
         return;
       }
-
       try {
+        setError(null);
+        console.log("[LocalStorageTest] Mounting miniapp at:", MINIAPP_URL);
         await boxoSdk.mount({
           container: containerRef.current,
-          url: MINIAPP_URL,
+          url: MINIAPP_URL, // Custom URL - key difference from other examples
           className: "miniapp-iframe",
         });
-        
-        // Ensure iframe has full size
-        const iframe = containerRef.current?.querySelector("iframe");
-        if (iframe) {
-          iframe.style.width = "100%";
-          iframe.style.height = "100%";
-          iframe.style.border = "none";
-        }
-        
+        console.log("[LocalStorageTest] Miniapp mounted successfully");
         setIsMounted(true);
-      } catch (error) {
-        console.error("[HostApp] Failed to mount miniapp:", error);
+        
+        // Check iframe after mount
+        setTimeout(() => {
+          const iframe = containerRef.current?.querySelector("iframe");
+          if (iframe) {
+            console.log("[LocalStorageTest] Iframe found, src:", iframe.src);
+            iframe.onload = () => {
+              console.log("[LocalStorageTest] Iframe loaded successfully");
+            };
+            iframe.onerror = (e) => {
+              console.error("[LocalStorageTest] Iframe load error:", e);
+              setError("Failed to load miniapp iframe");
+            };
+          } else {
+            console.warn("[LocalStorageTest] Iframe not found after mount");
+          }
+        }, 500);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Unknown error";
+        console.error("[LocalStorageTest] Mount error:", errorMsg);
+        setError(errorMsg);
       }
     };
 
-    // Wait a bit for container to be ready
+    // Wait a bit for container to be ready (keep setTimeout for safety)
     setTimeout(() => {
       mountMiniapp();
     }, 100);
 
     return () => {
-      // Cleanup message listener
+      boxoSdk.destroy();
       window.removeEventListener('message', messageListener, true);
     };
   }, [token, refreshToken]); // Re-initialize if tokens change
@@ -154,26 +172,20 @@ function LocalStorageTestExample() {
   return (
     <div className="App" style={{ padding: "20px", fontFamily: "system-ui, -apple-system, sans-serif" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "8px" }}>Miniapp Integration Demo</h1>
-        <p style={{ color: "#666", marginBottom: "24px", fontSize: "14px" }}>
-          Host application with embedded miniapp in iframe
-        </p>
-
-        {/* Status */}
-        <div
-          style={{
-            padding: "12px 16px",
-            backgroundColor: isMounted ? "#f0f9ff" : "#fff7ed",
-            border: `1px solid ${isMounted ? "#0ea5e9" : "#fb923c"}`,
-            borderRadius: "6px",
-            marginBottom: "20px",
-            fontSize: "14px",
-          }}
-        >
-          <strong>Status:</strong> {isMounted ? "Miniapp Ready" : "Waiting for miniapp..."}
-          <br />
-          <strong>Miniapp URL:</strong> {MINIAPP_URL}
-        </div>
+        <h1 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "8px" }}>Custom URL - Miniapp Container</h1>
+        {error && (
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "10px",
+              backgroundColor: "#fee",
+              border: "1px solid #fcc",
+              borderRadius: "4px",
+            }}
+          >
+            <strong>Error:</strong> {error}
+          </div>
+        )}
 
         {/* Token Input */}
         <div
@@ -249,22 +261,14 @@ function LocalStorageTestExample() {
         </div>
 
         {/* Miniapp Container (SDK will create iframe here) */}
-        <div
-          ref={containerRef}
-          className="miniapp-container"
-          style={{
-            width: "100%",
-            minHeight: "800px",
-            height: "80vh",
-            maxHeight: "1200px",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            overflow: "hidden",
-            backgroundColor: "#fff",
-            position: "relative",
-            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-          }}
-        />
+        <div className="iframe-container">
+          <div ref={containerRef} className="miniapp-container" />
+          <div className="iframe-note">
+            <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
+            <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
+            <p>URL: {MINIAPP_URL}</p>
+          </div>
+        </div>
 
         {/* Instructions */}
         <div
