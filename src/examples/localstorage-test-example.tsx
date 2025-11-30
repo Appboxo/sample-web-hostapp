@@ -57,8 +57,10 @@ function LocalStorageTestExample() {
 
       // Mock tokens for demo/testing - Replace with actual backend call
       await new Promise((resolve) => setTimeout(resolve, 500));
-      const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc4ODAwLCJpYXQiOjE3NjQ0OTI0MDAsImp0aSI6IjdlN2ZkNjNhNmQ2MjRmYTNhMjFjZmMxYjQ0ZGE5ZGI0Iiwic3ViIjoiOTYxIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.2L1S-kbUKaHTOTe_PHOACtgG2yvuAQPm3MVUuHOabFQ";
-      const mockRefreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTA5NzIwMCwiaWF0IjoxNzY0NDkyNDAwLCJqdGkiOiJmMjgyZDViNzE4Mjc0NTc4ODIyMjM2ZmM1Mzg3NWVkYiIsInN1YiI6Ijk2MSIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.4YklSesKxZ57I-9HLy-FCbbHphaDKb0qXnWWA80boTk";
+      const mockToken =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTgxNTMzLCJpYXQiOjE3NjQ0OTUxMzMsImp0aSI6IjhlOTYyMWM2YjRjNjRhM2Q4ZDVhNDhhZTBjMmQyM2U0Iiwic3ViIjoiOTYxIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.PjA1_ihdqtTHn7bXGf8ZWAZDxknHlUJ8rMA_8L1JORM";
+      const mockRefreshToken =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTA5OTkzMywiaWF0IjoxNzY0NDk1MTMzLCJqdGkiOiI4YzdiZjdkODlkZDQ0NzdjYmRkZTEwY2FlYzMwOTdmMCIsInN1YiI6Ijk2MSIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.VbnEQIokMxVSAnrd2rPRhuPD0w4ZTOZsXW2MsBerrGs";
 
       console.log("[Auth] Setting tokens from backend");
       boxoSdk.setAuthTokens(mockToken, mockRefreshToken);
@@ -101,9 +103,19 @@ function LocalStorageTestExample() {
   }, []);
 
   return (
-    <div className="App" style={{ padding: "20px", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+    <div
+      className="App"
+      style={{
+        padding: "20px",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+      }}
+    >
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "8px" }}>Custom URL - Miniapp Container</h1>
+        <h1
+          style={{ fontSize: "24px", fontWeight: "600", marginBottom: "8px" }}
+        >
+          Custom URL - Miniapp Container
+        </h1>
         {error && (
           <div
             style={{
@@ -127,11 +139,9 @@ function LocalStorageTestExample() {
             <p>URL: {MINIAPP_URL}</p>
           </div>
         </div>
-
       </div>
     </div>
   );
 }
 
 export default LocalStorageTestExample;
-
