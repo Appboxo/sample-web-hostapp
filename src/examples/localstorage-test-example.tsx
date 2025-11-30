@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { AppboxoWebSDK } from "@appboxo/web-sdk";
 
 // ============================================================================
@@ -6,9 +6,9 @@ import { AppboxoWebSDK } from "@appboxo/web-sdk";
 // ============================================================================
 const CLIENT_ID = "602248"; // Replace with actual clientId
 const APP_ID = "app_ovTT2l"; // Replace with actual appId
-// Miniapp URL - update this to match your miniapp ngrok domain
-// Miniapp is running on port 3000 with ngrok domain: summer.ngrok.dev
-// For testing with real miniapp, use root path: https://summer.ngrok.dev
+// Miniapp URL - fixed to summer.ngrok.dev (port 3000)
+// Host app runs on sample-web-hostapp.ngrok.app (port 3001)
+// Miniapp runs separately on summer.ngrok.dev (port 3000)
 const MINIAPP_URL =
   process.env.REACT_APP_MINIAPP_URL || "https://summer.ngrok.dev";
 
@@ -16,14 +16,30 @@ function LocalStorageTestExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string>(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0MzgzNzQ2LCJpYXQiOjE3NjQyOTczNDYsImp0aSI6ImViOWU5MGIyMTE4NDRlOTBiOTg1NjdmZjBjYmNmNzAzIiwic3ViIjoiOTYxIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.J_5Ac479JDjQHBqE94qmAOhiRilwK8nYmcXN2qbDt3o"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTc4ODAwLCJpYXQiOjE3NjQ0OTI0MDAsImp0aSI6IjdlN2ZkNjNhNmQ2MjRmYTNhMjFjZmMxYjQ0ZGE5ZGI0Iiwic3ViIjoiOTYxIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.2L1S-kbUKaHTOTe_PHOACtgG2yvuAQPm3MVUuHOabFQ"
   );
   const [refreshToken, setRefreshToken] = useState<string>(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NDkwMjE0NiwiaWF0IjoxNzY0Mjk3MzQ2LCJqdGkiOiIyOWY4MWVlZjM5ZDU0ZTdhYTg1NzIwNjAyMTk4MTljZSIsInN1YiI6Ijk2MSIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9._lcISt4SUridcG7heUVTccwPswowhEDjNNjzH2p8IN0"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTA5NzIwMCwiaWF0IjoxNzY0NDkyNDAwLCJqdGkiOiJmMjgyZDViNzE4Mjc0NTc4ODIyMjM2ZmM1Mzg3NWVkYiIsInN1YiI6Ijk2MSIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.4YklSesKxZ57I-9HLy-FCbbHphaDKb0qXnWWA80boTk"
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
+  
+  // Debug logs for visible display (Telegram WebView)
+  const [debugLogs, setDebugLogs] = useState<Array<{
+    time: string;
+    message: string;
+    type: 'info' | 'success' | 'error';
+    data?: any;
+  }>>([]);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
+  
+  const addDebugLog = useCallback((message: string, type: 'info' | 'success' | 'error' = 'info', data?: any) => {
+    const time = new Date().toLocaleTimeString();
+    const logEntry = { time, message, type, data };
+    setDebugLogs((prev) => [logEntry, ...prev.slice(0, 49)]); // Keep last 50 logs
+    console.log(`[HostApp] ${message}`, data || '');
+  }, []);
 
   useEffect(() => {
     // Prevent SDK from being created multiple times (React Strict Mode guard)
@@ -32,7 +48,7 @@ function LocalStorageTestExample() {
     }
     initRef.current = true;
     
-    // Add message listener for custom URL fallback
+    // Add message listener for manual response handling
     const messageListener = (event: MessageEvent) => {
       const eventData = event.data;
       
@@ -42,10 +58,8 @@ function LocalStorageTestExample() {
       
       if (isAppboxoSdkMessage) {
         const handler = eventData.handler || 'unknown';
-        console.log("[LocalStorageTest] Received SDK message:", handler, eventData);
         
         if (handler === 'AppBoxoWebAppGetInitData') {
-          console.log("[LocalStorageTest] Handling AppBoxoWebAppGetInitData request");
           // If SDK doesn't respond, manually send a response after a short delay
           setTimeout(() => {
             const iframe = containerRef.current?.querySelector("iframe");
@@ -65,26 +79,51 @@ function LocalStorageTestExample() {
                 },
                 request_id: eventData.request_id,
               };
-              console.log("[LocalStorageTest] Sending InitData response:", response);
+              
               iframe.contentWindow.postMessage(response, '*');
-            } else {
-              console.warn("[LocalStorageTest] Iframe not found when trying to send InitData");
             }
           }, 100);
+        } else if (handler === 'AppBoxoWebAppGetSystemInfo') {
+          // Immediately send a response for AppBoxoWebAppGetSystemInfo (don't wait for SDK)
+          const iframe = containerRef.current?.querySelector("iframe");
+          if (iframe?.contentWindow) {
+            const response = {
+              type: 'appboxo-host-response',
+              handler: 'AppBoxoWebAppGetSystemInfo',
+              data: {
+                model: 'iPhone',
+                brand: 'Apple',
+                platform: 'iOS',
+                SDKVersion: '1.0.0',
+                isSupportESim: true,
+              },
+              request_id: eventData.request_id,
+            };
+            
+            // Send immediately, before SDK processes it
+            iframe.contentWindow.postMessage(response, '*');
+            // Stop propagation to prevent SDK from handling it
+            event.stopImmediatePropagation();
+          }
         }
       }
     };
     
-    // Add listener before SDK initialization
+    // Add listener before SDK initialization (capture phase)
     window.addEventListener('message', messageListener, true);
     
     const boxoSdk = new AppboxoWebSDK({
       clientId: CLIENT_ID,
       appId: APP_ID,
-      debug: true, // Enable debug to see SDK messages
+      debug: false,
       isDesktop: true,
-      allowedOrigins: [], // Set `allowedOrigins` → restrict to specific domains
-      // Configure auth token callback - returns tokens from user input
+      allowedOrigins: [
+        window.location.origin,
+        new URL(MINIAPP_URL).origin,
+        "http://localhost:3000",
+        "https://summer.ngrok.dev",
+        "*",
+      ],
       onGetAuthTokens: async () => {
         if (token.trim() && refreshToken.trim()) {
           return {
@@ -113,31 +152,12 @@ function LocalStorageTestExample() {
       }
       try {
         setError(null);
-        console.log("[LocalStorageTest] Mounting miniapp at:", MINIAPP_URL);
         await boxoSdk.mount({
           container: containerRef.current,
-          url: MINIAPP_URL, // Custom URL - key difference from other examples
+          url: MINIAPP_URL,
           className: "miniapp-iframe",
         });
-        console.log("[LocalStorageTest] Miniapp mounted successfully");
         setIsMounted(true);
-        
-        // Check iframe after mount
-        setTimeout(() => {
-          const iframe = containerRef.current?.querySelector("iframe");
-          if (iframe) {
-            console.log("[LocalStorageTest] Iframe found, src:", iframe.src);
-            iframe.onload = () => {
-              console.log("[LocalStorageTest] Iframe loaded successfully");
-            };
-            iframe.onerror = (e) => {
-              console.error("[LocalStorageTest] Iframe load error:", e);
-              setError("Failed to load miniapp iframe");
-            };
-          } else {
-            console.warn("[LocalStorageTest] Iframe not found after mount");
-          }
-        }, 500);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Unknown error";
         console.error("[LocalStorageTest] Mount error:", errorMsg);
@@ -270,26 +290,76 @@ function LocalStorageTestExample() {
           </div>
         </div>
 
-        {/* Instructions */}
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "16px",
-            backgroundColor: "#f9fafb",
-            border: "1px solid #e5e7eb",
-            borderRadius: "6px",
-            fontSize: "13px",
-          }}
-        >
-          <h4 style={{ marginTop: 0, fontSize: "14px", fontWeight: "600", marginBottom: "8px" }}>Instructions</h4>
-          <ol style={{ marginBottom: 0, paddingLeft: "20px", color: "#6b7280", lineHeight: "1.6" }}>
-            <li>Ensure miniapp is running at: <code style={{ backgroundColor: "#f3f4f6", padding: "2px 6px", borderRadius: "4px" }}>{MINIAPP_URL}</code></li>
-            <li>Enter Access Token and Refresh Token in the input fields above</li>
-            <li>Click "Set Tokens" to configure authentication</li>
-            <li>Miniapp will automatically request tokens via SDK when needed</li>
-            <li>Check miniapp console for API calls and authentication status</li>
-          </ol>
-        </div>
+        {/* Debug Panel - Optional, hidden by default */}
+        {showDebugPanel && debugLogs.length > 0 && (
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "16px",
+              backgroundColor: "#1f2937",
+              border: "1px solid #374151",
+              borderRadius: "6px",
+              color: "#f3f4f6",
+              fontSize: "12px",
+              fontFamily: "monospace",
+              maxHeight: "300px",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <h4 style={{ margin: 0, fontSize: "14px", fontWeight: "600", color: "#60a5fa" }}>
+                Debug Logs
+              </h4>
+              <button
+                onClick={() => setShowDebugPanel(false)}
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#374151",
+                  color: "#f3f4f6",
+                  border: "1px solid #4b5563",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "11px",
+                }}
+              >
+                Hide
+              </button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {debugLogs.map((log, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: "8px",
+                    backgroundColor: log.type === 'error' ? '#7f1d1d' : 
+                                     log.type === 'success' ? '#14532d' : '#1f2937',
+                    borderLeft: `3px solid ${
+                      log.type === 'error' ? '#ef4444' : 
+                      log.type === 'success' ? '#22c55e' : '#6b7280'
+                    }`,
+                    borderRadius: "4px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <span style={{ color: "#9ca3af", fontSize: "10px" }}>{log.time}</span>
+                    <span style={{ 
+                      color: log.type === 'error' ? '#ef4444' : 
+                             log.type === 'success' ? '#22c55e' : '#9ca3af',
+                      fontSize: "10px",
+                      fontWeight: "600"
+                    }}>
+                      {log.type.toUpperCase()}
+                    </span>
+                  </div>
+                  <div style={{ color: "#f3f4f6" }}>
+                    {log.message}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

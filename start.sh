@@ -3,15 +3,6 @@
 # Stop any previously running instances
 ./stop.sh 2>/dev/null
 
-echo "Starting sample-web-hostapp dev server..."
-# Start React dev server in the background (port 3001)
-pnpm dev > /tmp/sample_web_hostapp_dev.log 2>&1 &
-DEV_PID=$!
-echo "Dev server started (PID: $DEV_PID) on port 3001"
-
-# Wait for dev server to start
-sleep 8
-
 echo "Starting ngrok..."
 # Use fixed domain if provided, otherwise use default
 NGROK_DOMAIN="${NGROK_DOMAIN:-sample-web-hostapp.ngrok.app}"
@@ -36,6 +27,20 @@ if [ -z "$NGROK_URL" ] || [ "$NGROK_URL" == "null" ]; then
   # Fallback if jq is not available
   NGROK_URL=$(curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"https://[^"]*"' | head -1 | cut -d'"' -f4)
 fi
+
+# Set REACT_APP_MINIAPP_URL to fixed miniapp domain (port 3000)
+# Miniapp runs separately on port 3000 with domain: summer.ngrok.dev
+export REACT_APP_MINIAPP_URL="${REACT_APP_MINIAPP_URL:-https://summer.ngrok.dev}"
+echo "Set REACT_APP_MINIAPP_URL=$REACT_APP_MINIAPP_URL"
+
+echo "Starting sample-web-hostapp dev server..."
+# Start React dev server in the background (port 3001) with environment variable
+pnpm dev > /tmp/sample_web_hostapp_dev.log 2>&1 &
+DEV_PID=$!
+echo "Dev server started (PID: $DEV_PID) on port 3001"
+
+# Wait for dev server to start
+sleep 8
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
