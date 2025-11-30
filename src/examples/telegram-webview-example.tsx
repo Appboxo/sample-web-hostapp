@@ -19,7 +19,7 @@ const APP_ID = "app_IvcTDV"; // Replace with actual appId
 const MINIAPP_URL =
   process.env.REACT_APP_MINIAPP_URL || "https://summer.ngrok.dev";
 
-function LocalStorageTestExample() {
+function TelegramWebViewExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string>(
@@ -357,4 +357,4 @@ function LocalStorageTestExample() {
   );
 }
 
-export default LocalStorageTestExample;
+export default TelegramWebViewExample;

@@ -1,13 +1,12 @@
 import "./App.css";
-import { OAuthExample, DirectAuthExample,  LocalStorageTestExample } from "./examples";
+import { OAuthExample, DirectAuthExample,  TelegramWebViewExample } from "./examples";
 import VercelExample from "./examples/vercel-example";
 
 enum ExampleType {
   OAuth = "oauth",
   Direct = "direct",
   Vercel = "vercel",
-  Telegram = "telegram",
-  LocalStorageTest = "localstorage-test",
+  TelegramWebView = "telegram-webview",
 }
 
 // Choose example via URL query param or environment variable
@@ -30,15 +29,12 @@ function getExampleType(): ExampleType {
     return envExample as ExampleType;
   }
   
-  // 3. Default to LocalStorageTest example
-  return ExampleType.LocalStorageTest;
+  // 3. Default to Telegram WebView example
+  return ExampleType.TelegramWebView;
 }
 
 function App() {
   const exampleType = getExampleType();
-  
-  console.log(`[App] Loading example: ${exampleType}`);
-  console.error(`[App] ERROR TEST - Loading example: ${exampleType}`);
   
   switch (exampleType) {
     case ExampleType.OAuth:
@@ -47,9 +43,8 @@ function App() {
       return <DirectAuthExample />;
     case ExampleType.Vercel:
       return <VercelExample />;
-    case ExampleType.LocalStorageTest:
-      console.log(`[App] About to render LocalStorageTestExample`);
-      return <LocalStorageTestExample />;
+    case ExampleType.TelegramWebView:
+      return <TelegramWebViewExample />;
     default:
       return <OAuthExample />;
   }
