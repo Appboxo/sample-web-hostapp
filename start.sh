@@ -29,8 +29,8 @@ if [ -z "$NGROK_URL" ] || [ "$NGROK_URL" == "null" ]; then
 fi
 
 # Set REACT_APP_MINIAPP_URL to fixed miniapp domain (port 3000)
-# Miniapp runs separately on port 3000 with domain: summer.ngrok.dev
-export REACT_APP_MINIAPP_URL="${REACT_APP_MINIAPP_URL:-https://summer.ngrok.dev}"
+# Miniapp runs separately on port 3000 with domain: kem-esim.ngrok.app
+export REACT_APP_MINIAPP_URL="${REACT_APP_MINIAPP_URL:-https://kem-esim.ngrok.app}"
 echo "Set REACT_APP_MINIAPP_URL=$REACT_APP_MINIAPP_URL"
 
 echo "Starting sample-web-hostapp dev server..."

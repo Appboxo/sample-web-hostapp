@@ -13,24 +13,50 @@ import { AppboxoWebSDK } from "@appboxo/web-sdk";
 // ============================================================================
 const CLIENT_ID = "host_a5801h7tkBLi"; // Replace with actual clientId
 const APP_ID = "app_IvcTDV"; // Replace with actual appId
-// Miniapp URL - fixed to summer.ngrok.dev (port 3000)
+// Miniapp URL - fixed to kem-esim.ngrok.app (port 3000)
 // Host app runs on sample-web-hostapp.ngrok.app (port 3001)
-// Miniapp runs separately on summer.ngrok.dev (port 3000)
+// Miniapp runs separately on kem-esim.ngrok.app (port 3000)
 const MINIAPP_URL =
-  process.env.REACT_APP_MINIAPP_URL || "https://summer.ngrok.dev";
+  process.env.REACT_APP_MINIAPP_URL || "https://kem-esim.ngrok.app";
+
+/**
+ * Detect if running in Telegram WebView environment
+ * Uses the same logic as finom-desktop-host-sdk's initDataHandler
+ */
+function detectTelegramWebView(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  // Check URL parameters
+  const urlParams = window.location.hash.includes('tgWebApp') || 
+                    window.location.search.includes('tgWebApp');
+  
+  // Check user agent
+  const userAgent = navigator.userAgent.includes('Telegram') || 
+                    navigator.userAgent.includes('WebView');
+  
+  // Check for Telegram SDK
+  const hasTelegramSDK = !!(window as any).Telegram?.WebApp;
+  
+  return urlParams || userAgent || hasTelegramSDK;
+}
 
 function TelegramWebViewExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string>(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTAyMjczLCJpYXQiOjE3NjQ1MDEzNzMsImp0aSI6IjM3NTk5M2Q5ZjFhYTRhYTRiOGIyMmY5NGQ1ZGJlMTFhIiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.VuV0qwpErS27MxyBMc1k65A_LIa6p3qiSCJRz3w5Jfc"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTIxNDgxLCJpYXQiOjE3NjQ1MjA1ODEsImp0aSI6IjgzMDc0OTdiY2E4MzRmMTRiM2M3NDRiNmM4ZWZhZGUyIiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.1wHjHwe7VLR2LvvrkhoElpLJSvM8ofEN_50LXQGUgNA"
   );
   const [refreshToken, setRefreshToken] = useState<string>(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTEwNjE3MywiaWF0IjoxNzY0NTAxMzczLCJqdGkiOiJiZDRiZWZkODY4Njc0Yjg0OGJkYzgxZTg2NWNiNzAxOSIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.qfhGXwozOeQlU1fKoEe-jHpS2OdJgKDoEXZCO3WrFfI"
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTEyNTM4MSwiaWF0IjoxNzY0NTIwNTgxLCJqdGkiOiJiOTZlOWNkYzUyNzg0OTI4YjQyM2EzNTViMDg2MGU5MSIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.McIyNfdDcMJaT_WdaYu6o-kilQrTIq9cL7Q54UGeRiE"
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
+  
+  // Detect Telegram WebView environment
+  const isTelegramWebView = detectTelegramWebView();
 
   // Debug logs for visible display (Telegram WebView)
   const [debugLogs, setDebugLogs] = useState<
@@ -73,7 +99,7 @@ function TelegramWebViewExample() {
         window.location.origin,
         new URL(MINIAPP_URL).origin,
         "http://localhost:3000",
-        "https://summer.ngrok.dev",
+        "https://kem-esim.ngrok.app",
         "*",
       ],
       // Not using onGetAuthTokens - using onAuth lifecycle hook instead
@@ -169,18 +195,6 @@ function TelegramWebViewExample() {
     };
   }, [token, refreshToken, addDebugLog]); // Re-initialize if tokens change
 
-  const sendToken = () => {
-    if (!token.trim()) {
-      alert("Please enter a token first");
-      return;
-    }
-
-    if (!refreshToken.trim()) {
-      alert("Please enter a refreshToken");
-      return;
-    }
-  };
-
   return (
     <div
       className="App"
@@ -208,6 +222,24 @@ function TelegramWebViewExample() {
             <strong>Error:</strong> {error}
           </div>
         )}
+
+        {/* Telegram WebView Detection Status */}
+        <div
+          style={{
+            marginBottom: "20px",
+            padding: "10px",
+            backgroundColor: "#f5f5f5",
+            border: "1px solid #ddd",
+            fontSize: "14px",
+          }}
+        >
+          <strong>Telegram WebView:</strong> {isTelegramWebView ? "Detected" : "Not Detected"}
+          {isTelegramWebView && (
+            <span style={{ marginLeft: "10px", color: "#666" }}>
+              (isTelegramWebView=true will be passed to miniapp)
+            </span>
+          )}
+        </div>
 
         {/* Miniapp Container (SDK will create iframe here) */}
         <div className="iframe-container">
