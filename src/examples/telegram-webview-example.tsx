@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { AppboxoWebSDK } from "@appboxo/web-sdk";
 import { detectTelegramWebView } from "../utils/telegram";
+import type { PaymentRequest, PaymentResponse } from "@appboxo/web-sdk";
+import { PaymentStatusValues } from "../utils/constants";
+import { createPaymentResponse } from "../utils/payment";
 
 // kem setttings
 // And additional envs for boxo:
@@ -8,6 +11,9 @@ import { detectTelegramWebView } from "../utils/telegram";
 // VITE_BOXO_SANDBOX_MODE="true"
 // VITE_BOXO_DEBUG="false"
 // VITE_BOXO_TRAVEL_ESIMS_APP_ID="app_IvcTDV"
+
+// Enable payment handling (set to false if your app doesn't handle payments)
+const ENABLE_PAYMENT = true;
 
 // ============================================================================
 // CONFIGURATION - Update with your miniapp URL
@@ -21,10 +27,10 @@ const MINIAPP_URL =
   process.env.REACT_APP_MINIAPP_URL || "https://kem-esim.ngrok.app";
 
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTcxNDIzLCJpYXQiOjE3NjQ1NzA1MjMsImp0aSI6IjYyODAyNDFlYjk0MjQ3OTJhYTdlYTlmN2I3NTYwOGZhIiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.xxAiggyi496S23cZqyVOk2okw7D-qhaMq0kQPkBB-WM";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTczNTk0LCJpYXQiOjE3NjQ1NzI2OTQsImp0aSI6IjljNzk4NjU4YzE4MDQzYzdhNzVlMmE1ZWQyOWZmZTM5Iiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.ojGaK_99hTmR7FHdtNBBZsZsUb2LQtX4duUQBJVpWlg";
 const refreshToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTE3NTMyMywiaWF0IjoxNzY0NTcwNTIzLCJqdGkiOiJmYzQ4YzAxZWM1NmE0N2E4YmE4MDIxNDhhMWYyOTEyNiIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.IIvewNXGjj8iB5HanN3sBnS8i6nDNov1vSASWgSg20M";
-
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTE3NzQ5NCwiaWF0IjoxNzY0NTcyNjk0LCJqdGkiOiJkN2JlNmQ2YzEyMzI0MTM0YWRkMjgxMjUxNDYwNjI2NCIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.zKMejlr3rYJ1qVIA0XWWtUHXXYxkn5842w_pBtqviq4";
+  
 function TelegramWebViewExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,8 +63,38 @@ function TelegramWebViewExample() {
         "https://kem-esim.ngrok.app",
         "*",
       ],
-      // Not using onGetAuthTokens - using onAuth lifecycle hook instead
+      // Payment handler (optional - remove if ENABLE_PAYMENT is false)
+      ...(ENABLE_PAYMENT && {
+        onPaymentRequest: async (
+          paymentData: PaymentRequest
+        ): Promise<PaymentResponse> => {
+          console.log("[Payment] Payment request:", paymentData);
+
+          // TODO: Replace with your payment API call
+          // const response = await fetch('/api/payments/process', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${yourToken}` },
+          //   body: JSON.stringify(paymentData)
+          // });
+          // const result = await response.json();
+
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return createPaymentResponse(
+            paymentData,
+            PaymentStatusValues.Success,
+            `order_${Date.now()}`
+          );
+        },
+      }),
     });
+
+    if (ENABLE_PAYMENT) {
+      boxoSdk.onPaymentComplete((success: boolean, data?: any) => {
+        console.log("[Payment] Payment complete:", success, data);
+      });
+    }
+
+
     sdkRef.current = boxoSdk;
 
     const mountMiniapp = async () => {

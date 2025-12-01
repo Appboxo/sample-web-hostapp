@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@appboxo/web-sdk':
-        specifier: file:../finom-desktop-host-sdk
-        version: file:../finom-desktop-host-sdk
+        specifier: ^1.4.0
+        version: 1.4.0
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -74,8 +74,8 @@ packages:
     peerDependencies:
       ajv: '>=8'
 
-  '@appboxo/web-sdk@file:../finom-desktop-host-sdk':
-    resolution: {directory: ../finom-desktop-host-sdk, type: directory}
+  '@appboxo/web-sdk@1.4.0':
+    resolution: {integrity: sha512-sImODwf18uY1IagU0Hxb774XMFrKI1c1VLE2H/p9ySab9HDu0YepdfEJAaw4ilenY7OMQl3j2Ph6F1o0cbr4nw==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -5574,7 +5574,7 @@ snapshots:
       jsonpointer: 5.0.1
       leven: 3.1.0
 
-  '@appboxo/web-sdk@file:../finom-desktop-host-sdk':
+  '@appboxo/web-sdk@1.4.0':
     dependencies:
       axios: 1.13.2
     transitivePeerDependencies:
