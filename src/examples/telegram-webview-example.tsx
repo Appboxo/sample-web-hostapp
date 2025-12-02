@@ -20,16 +20,11 @@ const ENABLE_PAYMENT = true;
 // ============================================================================
 const CLIENT_ID = "host_a5801h7tkBLi"; // Replace with actual clientId
 const APP_ID = "app_IvcTDV"; // Replace with actual appId
-// Miniapp URL - fixed to kem-esim.ngrok.app (port 3000)
-// Host app runs on sample-web-hostapp.ngrok.app (port 3001)
-// Miniapp runs separately on kem-esim.ngrok.app (port 3000)
-const MINIAPP_URL =
-  process.env.REACT_APP_MINIAPP_URL || "https://kem-esim.ngrok.app";
 
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NTczNTk0LCJpYXQiOjE3NjQ1NzI2OTQsImp0aSI6IjljNzk4NjU4YzE4MDQzYzdhNzVlMmE1ZWQyOWZmZTM5Iiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.ojGaK_99hTmR7FHdtNBBZsZsUb2LQtX4duUQBJVpWlg";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NjkyMjI3LCJpYXQiOjE3NjQ2OTEzMjcsImp0aSI6ImY5YmYxOWQ4ZWYwMzRlZDc5OTBkN2JiOWJjYzdiNGExIiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.6R2ulJy46N8grnR1-PMMSL0o1PrjOGsRif7C-GsJRYk";
 const refreshToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTE3NzQ5NCwiaWF0IjoxNzY0NTcyNjk0LCJqdGkiOiJkN2JlNmQ2YzEyMzI0MTM0YWRkMjgxMjUxNDYwNjI2NCIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.zKMejlr3rYJ1qVIA0XWWtUHXXYxkn5842w_pBtqviq4";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTI5NjEyNywiaWF0IjoxNzY0NjkxMzI3LCJqdGkiOiJhNjNiNmIzNGE5ZGE0NzNhYmY1Y2I0OTNmN2EzMGIzOCIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.2zb0ujUZY5hFbQ88Z2MdXPIefj6mHW3yTxR2AKZ0Lvw";
   
 function TelegramWebViewExample() {
   const [isMounted, setIsMounted] = useState(false);
@@ -56,13 +51,6 @@ function TelegramWebViewExample() {
       appId: APP_ID,
       debug: true, // Enable debug to see SDK logs
       isDesktop: true,
-      allowedOrigins: [
-        window.location.origin,
-        new URL(MINIAPP_URL).origin,
-        "http://localhost:3000",
-        "https://kem-esim.ngrok.app",
-        "*",
-      ],
       // Payment handler (optional - remove if ENABLE_PAYMENT is false)
       ...(ENABLE_PAYMENT && {
         onPaymentRequest: async (
@@ -105,7 +93,6 @@ function TelegramWebViewExample() {
         setError(null);
         const iframe = await boxoSdk.mount({
           container: containerRef.current,
-          url: MINIAPP_URL,
           className: "miniapp-iframe",
         });
         setIsMounted(true);
@@ -212,7 +199,6 @@ function TelegramWebViewExample() {
           <div className="iframe-note">
             <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
             <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
-            <p>URL: {MINIAPP_URL}</p>
             <button
               onClick={() => {
                 if (sdkRef.current) {

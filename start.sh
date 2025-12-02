@@ -33,9 +33,16 @@ fi
 export REACT_APP_MINIAPP_URL="${REACT_APP_MINIAPP_URL:-https://kem-esim.ngrok.app}"
 echo "Set REACT_APP_MINIAPP_URL=$REACT_APP_MINIAPP_URL"
 
+# Set NODE_OPTIONS to fix localStorage issue in Node.js v20+
+export NODE_OPTIONS="--localstorage-file=/tmp/localstorage.json"
+export PORT=3001
+echo "Set NODE_OPTIONS=$NODE_OPTIONS"
+echo "Set PORT=$PORT"
+
 echo "Starting sample-web-hostapp dev server..."
 # Start React dev server in the background (port 3001) with environment variable
-pnpm dev > /tmp/sample_web_hostapp_dev.log 2>&1 &
+# Use env to ensure NODE_OPTIONS is passed to all child processes
+env NODE_OPTIONS="$NODE_OPTIONS" PORT="$PORT" REACT_APP_MINIAPP_URL="$REACT_APP_MINIAPP_URL" pnpm dev > /tmp/sample_web_hostapp_dev.log 2>&1 &
 DEV_PID=$!
 echo "Dev server started (PID: $DEV_PID) on port 3001"
 
