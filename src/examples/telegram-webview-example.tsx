@@ -159,7 +159,7 @@ function TelegramWebViewExample() {
         <h1
           style={{ fontSize: "24px", fontWeight: "600", marginBottom: "8px" }}
         >
-          Custom URL - Miniapp Container
+          Telegram WebView - Miniapp Container
         </h1>
         {error && (
           <div
@@ -185,7 +185,8 @@ function TelegramWebViewExample() {
             fontSize: "14px",
           }}
         >
-          <strong>Telegram WebView:</strong> {isTelegramWebView ? "Detected" : "Not Detected"}
+          <strong>Telegram WebView:</strong>
+          {isTelegramWebView ? "Detected" : "Not Detected"}
           {isTelegramWebView && (
             <span style={{ marginLeft: "10px", color: "#666" }}>
               (isTelegramWebView=true will be passed to miniapp)
