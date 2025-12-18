@@ -1,5 +1,9 @@
 import "./App.css";
-import { OAuthExample, DirectAuthExample,  TelegramWebViewExample } from "./examples";
+import {
+  OAuthExample,
+  DirectAuthExample,
+  TelegramWebViewExample,
+} from "./examples";
 import VercelExample from "./examples/vercel-example";
 
 enum ExampleType {
@@ -17,25 +21,31 @@ enum ExampleType {
 function getExampleType(): ExampleType {
   // 1. Check URL query parameter
   const urlParams = new URLSearchParams(window.location.search);
-  const exampleParam = urlParams.get('example');
-  
-  if (exampleParam && Object.values(ExampleType).includes(exampleParam as ExampleType)) {
+  const exampleParam = urlParams.get("example");
+
+  if (
+    exampleParam &&
+    Object.values(ExampleType).includes(exampleParam as ExampleType)
+  ) {
     return exampleParam as ExampleType;
   }
-  
+
   // 2. Check environment variable
   const envExample = process.env.REACT_APP_EXAMPLE;
-  if (envExample && Object.values(ExampleType).includes(envExample as ExampleType)) {
+  if (
+    envExample &&
+    Object.values(ExampleType).includes(envExample as ExampleType)
+  ) {
     return envExample as ExampleType;
   }
-  
+
   // 3. Default to Telegram WebView example
-  return ExampleType.TelegramWebView;
+  return ExampleType.Vercel;
 }
 
 function App() {
   const exampleType = getExampleType();
-  
+
   switch (exampleType) {
     case ExampleType.OAuth:
       return <OAuthExample />;

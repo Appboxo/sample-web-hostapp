@@ -8,7 +8,7 @@ import { createPaymentResponse } from "../utils/payment";
 // CONFIGURATION
 // ============================================================================
 const CLIENT_ID = "602248"; // Replace with actual clientId
-const APP_ID = "app_ovTT2l"; // Replace with actual appId
+const APP_ID = "app_YQ7Phw"; // Replace with actual appId
 
 // Enable payment handling (set to false if your app doesn't handle payments)
 const ENABLE_PAYMENT = true;
@@ -38,7 +38,6 @@ function VercelExample() {
       appId: APP_ID,
       debug: true, // Enable debug mode to see what's happening
       // locale: "ar",
-      isDesktop: true,
       allowedOrigins: [], // Set `allowedOrigins` → restrict to specific domains
       // Payment handler (optional - remove if ENABLE_PAYMENT is false)
       ...(ENABLE_PAYMENT && {
