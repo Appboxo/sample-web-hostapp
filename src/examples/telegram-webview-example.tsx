@@ -22,13 +22,14 @@ const CLIENT_ID = "host_a5801h7tkBLi"; // Replace with actual clientId
 const APP_ID = "app_IvcTDV"; // Replace with actual appId
 
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NjkyMjI3LCJpYXQiOjE3NjQ2OTEzMjcsImp0aSI6ImY5YmYxOWQ4ZWYwMzRlZDc5OTBkN2JiOWJjYzdiNGExIiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.6R2ulJy46N8grnR1-PMMSL0o1PrjOGsRif7C-GsJRYk";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NzM5MjQzLCJpYXQiOjE3NjQ3MzgzNDMsImp0aSI6ImYzM2Y0NGQwMWE3NjRmNzk4ZTk4N2NkNDdiMTc3MTVkIiwic3ViIjoiODczIiwiYXVkIjoiZXNpbS1taW5pYXBwIiwiaXNzIjoiZXNpbS1zZXJ2aWNlIn0.iTfVsnruDkUoj6v_LQc6JyjinjPY7JGy0IsE_jhnGx4";
 const refreshToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTI5NjEyNywiaWF0IjoxNzY0NjkxMzI3LCJqdGkiOiJhNjNiNmIzNGE5ZGE0NzNhYmY1Y2I0OTNmN2EzMGIzOCIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.2zb0ujUZY5hFbQ88Z2MdXPIefj6mHW3yTxR2AKZ0Lvw";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NTM0MzE0MywiaWF0IjoxNzY0NzM4MzQzLCJqdGkiOiI5NDg2YzMzNGYxMTA0YzEyODcyMzdiYTM1YjQyZTc1NyIsInN1YiI6Ijg3MyIsImF1ZCI6ImVzaW0tbWluaWFwcCIsImlzcyI6ImVzaW0tc2VydmljZSJ9.LEqH_sDFb_UezBL2JOb2Frdk5q2DremS6firvmcoED0";
   
 function TelegramWebViewExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
@@ -36,6 +37,20 @@ function TelegramWebViewExample() {
   // Detect Telegram WebView environment
   const isTelegramWebView = detectTelegramWebView();
   const [showDebugPanel, setShowDebugPanel] = useState(true); // Show by default
+
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    const actualTheme = theme === 'system' 
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme;
+    htmlElement.setAttribute('data-theme', actualTheme);
+  }, []);
+
+  useEffect(() => {
+    if (sdkRef.current && theme) {
+      sdkRef.current.setTheme(theme);
+    }
+  }, [theme]);
 
   useEffect(() => {
     // Prevent SDK from being created multiple times (React Strict Mode guard)
@@ -50,7 +65,7 @@ function TelegramWebViewExample() {
       clientId: CLIENT_ID,
       appId: APP_ID,
       debug: true, // Enable debug to see SDK logs
-      isDesktop: true,
+      theme: theme,
       // Payment handler (optional - remove if ENABLE_PAYMENT is false)
       ...(ENABLE_PAYMENT && {
         onPaymentRequest: async (
@@ -145,7 +160,7 @@ function TelegramWebViewExample() {
     return () => {
       boxoSdk.destroy();
     };
-  }, []); // Re-initialize if tokens change
+  }, [theme]); // Re-initialize if theme changes
 
   return (
     <div
@@ -200,30 +215,78 @@ function TelegramWebViewExample() {
           <div className="iframe-note">
             <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
             <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
-            <button
-              onClick={() => {
-                if (sdkRef.current) {
-                  console.log("[OAuthExample] Calling logout()");
-                  sdkRef.current.logout();
-                  console.log("[OAuthExample] Logout completed");
-                  alert(
-                    "Logout called! Check console and localStorage/sessionStorage."
-                  );
-                }
-              }}
-              style={{
-                marginTop: "10px",
-                padding: "8px 16px",
-                backgroundColor: "#f44336",
-                color: "white",
-                border: "none",
+            <div style={{ marginTop: "10px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              <button
+                onClick={() => {
+                  if (sdkRef.current) {
+                    console.log("[TelegramWebViewExample] Calling logout()");
+                    sdkRef.current.logout();
+                    console.log("[TelegramWebViewExample] Logout completed");
+                    alert(
+                      "Logout called! Check console and localStorage/sessionStorage."
+                    );
+                  }
+                }}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#f44336",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                Logout
+              </button>
+              <div style={{ 
+                display: "flex", 
+                gap: "8px", 
+                alignItems: "center",
+                padding: "6px 12px",
+                backgroundColor: "var(--bg-secondary, #f8f9fa)",
+                border: "1px solid var(--border-color, #e9ecef)",
                 borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Logout
-            </button>
+              }}>
+                <label style={{ 
+                  fontSize: "12px", 
+                  fontWeight: "500",
+                  color: "var(--text-primary, #212529)",
+                  marginRight: "4px" 
+                }}>
+                  Theme:
+                </label>
+                <select
+                  value={theme}
+                  onChange={(e) => {
+                    const newTheme = e.target.value as 'dark' | 'light' | 'system';
+                    setTheme(newTheme);
+                    const htmlElement = document.documentElement;
+                    const actualTheme = newTheme === 'system' 
+                      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                      : newTheme;
+                    htmlElement.setAttribute('data-theme', actualTheme);
+                    if (sdkRef.current) {
+                      sdkRef.current.setTheme(newTheme);
+                    }
+                  }}
+                  style={{
+                    padding: "4px 8px",
+                    border: "1px solid var(--border-color, #ccc)",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    backgroundColor: "var(--bg-secondary, white)",
+                    color: "var(--text-primary, #212529)",
+                    outline: "none",
+                  }}
+                >
+                  <option value="system">System</option>
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 

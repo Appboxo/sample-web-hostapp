@@ -1,12 +1,15 @@
 .App {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg-primary, #f8f9fa);
+  color: var(--text-primary, #212529);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .App-header {
   padding: 1.5rem 2rem;
-  background: white;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--bg-secondary, white);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .App-header h1 {
@@ -33,7 +36,7 @@
 .main-container {
   display: flex;
   min-height: calc(100vh - 200px);
-  padding: 2rem;
+  /* padding: 2rem; */
   gap: 2rem;
   max-width: 1600px;
   margin: 0 auto;
@@ -63,10 +66,11 @@
 }
 
 .card {
-  background: white;
+  background: var(--bg-secondary, white);
   border-radius: 6px;
   padding: 1.25rem;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, #e9ecef);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .card h2 {
@@ -212,8 +216,9 @@
 
 .iframe-note {
   padding: 0.75rem;
-  background: white;
-  border-top: 1px solid #e9ecef;
+  background: var(--bg-secondary, white);
+  border-top: 1px solid var(--border-color, #e9ecef);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .iframe-note p {
@@ -285,6 +290,167 @@
 
 .log-error .log-message {
   color: #721c24;
+}
+
+/* CSS Variables - Light mode (default) */
+:root {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-tertiary: #adb5bd;
+  --border-color: #e9ecef;
+}
+
+/* Dark mode support - System preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #808080;
+    --border-color: #404040;
+  }
+}
+
+/* Dark mode - Force dark */
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3a3a3a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #808080;
+  --border-color: #404040;
+}
+
+/* Light mode - Force light */
+[data-theme="light"] {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-tertiary: #adb5bd;
+  --border-color: #e9ecef;
+}
+
+[data-theme="dark"] .App {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .App-header {
+  background: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .App-header h1 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .subtitle {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .subtitle code {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .card {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .card h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .status-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .status-card h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .status-item {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .status-item.active {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .status-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .status-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn:disabled {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .btn-primary {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+  background: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+[data-theme="dark"] .iframe-container {
+  border-color: var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .iframe-note {
+  background: var(--bg-secondary);
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .iframe-note p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .logs-container {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .log-entry {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .log-time {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .log-message {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .log-data {
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

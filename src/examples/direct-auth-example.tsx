@@ -16,9 +16,24 @@ const ENABLE_PAYMENT = true;
 function DirectAuthExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const containerRef = useRef<HTMLDivElement>(null);
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
+
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    const actualTheme = theme === 'system' 
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme;
+    htmlElement.setAttribute('data-theme', actualTheme);
+  }, []);
+
+  useEffect(() => {
+    if (sdkRef.current && theme) {
+      sdkRef.current.setTheme(theme);
+    }
+  }, [theme]);
 
   useEffect(() => {
     // Prevent SDK from being created multiple times (React Strict Mode guard)
@@ -32,6 +47,7 @@ function DirectAuthExample() {
       clientId: CLIENT_ID,
       appId: APP_ID,
       debug: false,
+      theme: theme,
       // locale: "ar",
       isDesktop: true,
       allowedOrigins: [], // Set `allowedOrigins` → restrict to specific domains
@@ -128,7 +144,7 @@ function DirectAuthExample() {
     return () => {
       boxoSdk.destroy();
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div className="App">
@@ -154,30 +170,78 @@ function DirectAuthExample() {
               <div className="iframe-note">
                 <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
                 <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
-                <button
-                  onClick={() => {
-                    if (sdkRef.current) {
-                      console.log("[OAuthExample] Calling logout()");
-                      sdkRef.current.logout();
-                      console.log("[OAuthExample] Logout completed");
-                      alert(
-                        "Logout called! Check console and localStorage/sessionStorage."
-                      );
-                    }
-                  }}
-                  style={{
-                    marginTop: "10px",
-                    padding: "8px 16px",
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    border: "none",
+                <div style={{ marginTop: "10px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => {
+                      if (sdkRef.current) {
+                        console.log("[DirectAuthExample] Calling logout()");
+                        sdkRef.current.logout();
+                        console.log("[DirectAuthExample] Logout completed");
+                        alert(
+                          "Logout called! Check console and localStorage/sessionStorage."
+                        );
+                      }
+                    }}
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#f44336",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Logout
+                  </button>
+                  <div style={{ 
+                    display: "flex", 
+                    gap: "8px", 
+                    alignItems: "center",
+                    padding: "6px 12px",
+                    backgroundColor: "var(--bg-secondary, #f8f9fa)",
+                    border: "1px solid var(--border-color, #e9ecef)",
                     borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                  }}
-                >
-                  Logout
-                </button>
+                  }}>
+                    <label style={{ 
+                      fontSize: "12px", 
+                      fontWeight: "500",
+                      color: "var(--text-primary, #212529)",
+                      marginRight: "4px" 
+                    }}>
+                      Theme:
+                    </label>
+                    <select
+                      value={theme}
+                      onChange={(e) => {
+                        const newTheme = e.target.value as 'dark' | 'light' | 'system';
+                        setTheme(newTheme);
+                        const htmlElement = document.documentElement;
+                        const actualTheme = newTheme === 'system' 
+                          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                          : newTheme;
+                        htmlElement.setAttribute('data-theme', actualTheme);
+                        if (sdkRef.current) {
+                          sdkRef.current.setTheme(newTheme);
+                        }
+                      }}
+                      style={{
+                        padding: "4px 8px",
+                        border: "1px solid var(--border-color, #ccc)",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        backgroundColor: "var(--bg-secondary, white)",
+                        color: "var(--text-primary, #212529)",
+                        outline: "none",
+                      }}
+                    >
+                      <option value="system">System</option>
+                      <option value="dark">Dark</option>
+                      <option value="light">Light</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
