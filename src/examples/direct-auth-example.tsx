@@ -21,16 +21,19 @@ function DirectAuthExample() {
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
 
+  // Apply theme to host app document
   useEffect(() => {
     const htmlElement = document.documentElement;
     const actualTheme = theme === 'system' 
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : theme;
     htmlElement.setAttribute('data-theme', actualTheme);
-  }, []);
+  }, [theme]);
 
+  // Handle theme changes - notify SDK when theme state changes
   useEffect(() => {
     if (sdkRef.current && theme) {
+      console.log(`[DirectAuthExample] Theme changed to: ${theme}, notifying SDK`);
       sdkRef.current.setTheme(theme);
     }
   }, [theme]);
@@ -144,7 +147,7 @@ function DirectAuthExample() {
     return () => {
       boxoSdk.destroy();
     };
-  }, [theme]);
+  }, []); // Remove theme from dependency array - SDK should only initialize once, theme changes are handled by separate useEffect
 
   return (
     <div className="App">

@@ -38,16 +38,19 @@ function TelegramWebViewExample() {
   const isTelegramWebView = detectTelegramWebView();
   const [showDebugPanel, setShowDebugPanel] = useState(true); // Show by default
 
+  // Apply theme to host app document
   useEffect(() => {
     const htmlElement = document.documentElement;
     const actualTheme = theme === 'system' 
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : theme;
     htmlElement.setAttribute('data-theme', actualTheme);
-  }, []);
+  }, [theme]);
 
+  // Handle theme changes - notify SDK when theme state changes
   useEffect(() => {
     if (sdkRef.current && theme) {
+      console.log(`[TelegramWebViewExample] Theme changed to: ${theme}, notifying SDK`);
       sdkRef.current.setTheme(theme);
     }
   }, [theme]);
@@ -160,7 +163,7 @@ function TelegramWebViewExample() {
     return () => {
       boxoSdk.destroy();
     };
-  }, [theme]); // Re-initialize if theme changes
+  }, []); // Remove theme from dependency array - SDK should only initialize once, theme changes are handled by separate useEffect
 
   return (
     <div
