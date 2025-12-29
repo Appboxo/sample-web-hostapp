@@ -246,7 +246,7 @@ function VercelExample() {
     return () => {
       boxoSdk.destroy();
     };
-  }, [theme]);
+  }, []); // Remove theme from dependency array - SDK should only initialize once, theme changes are handled by separate useEffect
 
   return (
     <div className="App">
