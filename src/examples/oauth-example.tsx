@@ -21,16 +21,19 @@ function OAuthExample() {
   const sdkRef = useRef<AppboxoWebSDK | null>(null);
   const initRef = useRef(false); // Guard to prevent duplicate SDK initialization
 
+  // Apply theme to host app document
   useEffect(() => {
     const htmlElement = document.documentElement;
     const actualTheme = theme === 'system' 
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : theme;
     htmlElement.setAttribute('data-theme', actualTheme);
-  }, []);
+  }, [theme]);
 
+  // Handle theme changes - notify SDK when theme state changes
   useEffect(() => {
     if (sdkRef.current && theme) {
+      console.log(`[OAuthExample] Theme changed to: ${theme}, notifying SDK`);
       sdkRef.current.setTheme(theme);
     }
   }, [theme]);
@@ -175,16 +178,13 @@ function OAuthExample() {
                       onChange={(e) => {
                         const newTheme = e.target.value as 'dark' | 'light' | 'system';
                         setTheme(newTheme);
-                        // Apply theme to host app document
+                        // Apply theme to host app document immediately
                         const htmlElement = document.documentElement;
                         const actualTheme = newTheme === 'system' 
                           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
                           : newTheme;
                         htmlElement.setAttribute('data-theme', actualTheme);
-                        // SDK automatically notifies miniapp about theme change
-                        if (sdkRef.current) {
-                          sdkRef.current.setTheme(newTheme);
-                        }
+                        // Note: SDK setTheme will be called automatically by useEffect when theme state updates
                       }}
                       style={{
                         padding: "4px 8px",
