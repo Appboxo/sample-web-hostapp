@@ -8,7 +8,7 @@ import { createPaymentResponse } from "../utils/payment";
 // CONFIGURATION
 // ============================================================================
 const CLIENT_ID = "602248"; // Replace with actual clientId
-const APP_ID = "app_YQ7Phw"; // Replace with actual appId
+const APP_ID = "app_zRq0sQ"; // Replace with actual appId
 
 // Enable payment handling (set to false if your app doesn't handle payments)
 const ENABLE_PAYMENT = true;
@@ -16,7 +16,7 @@ const ENABLE_PAYMENT = true;
 function VercelExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('light');
   const [debugInfo, setDebugInfo] = useState<{
     miniappUrl?: string;
     iframeLoaded?: boolean;
