@@ -8,7 +8,7 @@ import { createPaymentResponse } from "../utils/payment";
 // CONFIGURATION
 // ============================================================================
 const CLIENT_ID = "602248"; // Replace with actual clientId
-const APP_ID = "app_zRq0sQ"; // Replace with actual appId
+const APP_ID = "app_UYRZWO"; // Replace with actual appId
 
 // Enable payment handling (set to false if your app doesn't handle payments)
 const ENABLE_PAYMENT = true;
@@ -16,7 +16,7 @@ const ENABLE_PAYMENT = true;
 function VercelExample() {
   const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('light');
+  const [theme, setTheme] = useState<"dark" | "light" | "system">("light");
   const [debugInfo, setDebugInfo] = useState<{
     miniappUrl?: string;
     iframeLoaded?: boolean;
@@ -29,10 +29,13 @@ function VercelExample() {
   // Apply theme to host app document
   useEffect(() => {
     const htmlElement = document.documentElement;
-    const actualTheme = theme === 'system' 
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : theme;
-    htmlElement.setAttribute('data-theme', actualTheme);
+    const actualTheme =
+      theme === "system"
+        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+        : theme;
+    htmlElement.setAttribute("data-theme", actualTheme);
   }, [theme]);
 
   // Handle theme changes - notify SDK when theme state changes
@@ -61,7 +64,7 @@ function VercelExample() {
       // Payment handler (optional - remove if ENABLE_PAYMENT is false)
       ...(ENABLE_PAYMENT && {
         onPaymentRequest: async (
-          paymentData: PaymentRequest
+          paymentData: PaymentRequest,
         ): Promise<PaymentResponse> => {
           console.log("[Payment] Payment request:", paymentData);
 
@@ -77,7 +80,7 @@ function VercelExample() {
           return createPaymentResponse(
             paymentData,
             PaymentStatusValues.Success,
-            `order_${Date.now()}`
+            `order_${Date.now()}`,
           );
         },
       }),
@@ -112,8 +115,8 @@ function VercelExample() {
 
         // Function to check iframe
         const checkIframe = () => {
-          const iframe:any = containerRef.current?.querySelector(
-            "iframe"
+          const iframe: any = containerRef.current?.querySelector(
+            "iframe",
           ) as HTMLIFrameElement | null;
           if (iframe && iframe.src && iframe.src !== window.location.href) {
             console.log("[OAuthExample] Iframe found:", {
@@ -138,28 +141,28 @@ function VercelExample() {
               // The miniapp needs to use TelegramStorage class or web-sdk needs to handle it
               // For now, Storage Bridge is ready to handle STORAGE_REQUEST messages
               console.log(
-                "[OAuthExample] Storage Bridge is ready. Waiting for miniapp to send STORAGE_REQUEST..."
+                "[OAuthExample] Storage Bridge is ready. Waiting for miniapp to send STORAGE_REQUEST...",
               );
 
               // Wait a bit and check if miniapp has sent any messages
               setTimeout(() => {
                 console.log(
-                  "[OAuthExample] Checking miniapp status after 3 seconds..."
+                  "[OAuthExample] Checking miniapp status after 3 seconds...",
                 );
                 console.log("[OAuthExample] If you see a white screen, check:");
                 console.log(
-                  "  1. Eruda Network tab - are there failed requests?"
+                  "  1. Eruda Network tab - are there failed requests?",
                 );
                 console.log(
-                  "  2. Eruda Console tab - are there errors from miniapp?"
+                  "  2. Eruda Console tab - are there errors from miniapp?",
                 );
                 console.log(
-                  "  3. Is miniapp waiting for InitData? (web-sdk is ready)"
+                  "  3. Is miniapp waiting for InitData? (web-sdk is ready)",
                 );
               }, 3000);
             };
 
-            iframe.onerror = (e:any) => {
+            iframe.onerror = (e: any) => {
               console.error("[OAuthExample] Iframe load error:", e);
               setError("Failed to load miniapp iframe");
               setDebugInfo((prev) => ({
@@ -188,7 +191,7 @@ function VercelExample() {
               } catch (e) {
                 // CORS error is expected, but iframe exists
                 console.log(
-                  "[OAuthExample] Iframe exists but CORS prevents access (normal)"
+                  "[OAuthExample] Iframe exists but CORS prevents access (normal)",
                 );
               }
             }
@@ -207,7 +210,7 @@ function VercelExample() {
               clearInterval(pollInterval);
               if (attempts > 20) {
                 console.warn(
-                  "[OAuthExample] Iframe not found after 10 seconds"
+                  "[OAuthExample] Iframe not found after 10 seconds",
                 );
                 setDebugInfo((prev) => ({
                   ...prev,
@@ -236,7 +239,7 @@ function VercelExample() {
           new ErrorEvent("error", {
             message: errorMessage,
             error: err instanceof Error ? err : new Error(String(err)),
-          })
+          }),
         );
       }
     };
@@ -268,7 +271,11 @@ function VercelExample() {
               </div>
             )}
             <div className="">
-              <div ref={containerRef} className="" style={{width: "100%", height: "100vh"}} />
+              <div
+                ref={containerRef}
+                className=""
+                style={{ width: "100%", height: "100vh" }}
+              />
               <div className="iframe-note">
                 <p>Status: {isMounted ? "Mounted" : "Mounting..."}</p>
                 <p>SDK: {sdkRef.current ? "Ready" : "Initializing"}</p>
@@ -318,7 +325,14 @@ function VercelExample() {
                       ))}
                     </div>
                   )}
-                <div style={{ marginTop: "10px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <button
                     onClick={() => {
                       if (sdkRef.current) {
@@ -326,7 +340,7 @@ function VercelExample() {
                         sdkRef.current.logout();
                         console.log("[VercelExample] Logout completed");
                         alert(
-                          "Logout called! Check console and localStorage/sessionStorage."
+                          "Logout called! Check console and localStorage/sessionStorage.",
                         );
                       }
                     }}
@@ -342,34 +356,45 @@ function VercelExample() {
                   >
                     Logout
                   </button>
-                  <div style={{ 
-                    display: "flex", 
-                    gap: "8px", 
-                    alignItems: "center",
-                    padding: "6px 12px",
-                    backgroundColor: "var(--bg-secondary, #f8f9fa)",
-                    border: "1px solid var(--border-color, #e9ecef)",
-                    borderRadius: "4px",
-                  }}>
-                    <label style={{ 
-                      fontSize: "12px", 
-                      fontWeight: "500",
-                      color: "var(--text-primary, #212529)",
-                      marginRight: "4px" 
-                    }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                      padding: "6px 12px",
+                      backgroundColor: "var(--bg-secondary, #f8f9fa)",
+                      border: "1px solid var(--border-color, #e9ecef)",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    <label
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: "500",
+                        color: "var(--text-primary, #212529)",
+                        marginRight: "4px",
+                      }}
+                    >
                       Theme:
                     </label>
                     <select
                       value={theme}
                       onChange={(e) => {
-                        const newTheme = e.target.value as 'dark' | 'light' | 'system';
+                        const newTheme = e.target.value as
+                          | "dark"
+                          | "light"
+                          | "system";
                         setTheme(newTheme);
                         // Apply theme to host app document immediately
                         const htmlElement = document.documentElement;
-                        const actualTheme = newTheme === 'system' 
-                          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-                          : newTheme;
-                        htmlElement.setAttribute('data-theme', actualTheme);
+                        const actualTheme =
+                          newTheme === "system"
+                            ? window.matchMedia("(prefers-color-scheme: dark)")
+                                .matches
+                              ? "dark"
+                              : "light"
+                            : newTheme;
+                        htmlElement.setAttribute("data-theme", actualTheme);
                         // Note: SDK setTheme will be called automatically by useEffect when theme state updates
                       }}
                       style={{
